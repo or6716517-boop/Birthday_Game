@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memory Match Game</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: url('Background/Red and White Creative Love Presentation.png') no-repeat center center/cover;
+      font-family: Arial, sans-serif;
+    }
+
+    h1 {
+      color: #fff;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+
+    .game-container {
+      display: grid;
+      grid-template-columns: repeat(4, 80px);
+      grid-gap: 15px;
+      background: rgba(255,255,255,0.8);
+      padding: 20px;
+      border-radius: 15px;
+    }
+
+    .card {
+      width: 80px;
+      height: 80px;
+      perspective: 1000px;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+      cursor: pointer;
+    }
+
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 10px;
+    }
+
+    .card-front {
+      background: #ffcccc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .card-back {
+      transform: rotateY(180deg);
+      background-size: cover;
+      background-position: center;
+      border: 2px solid #fff;
+    }
+
+    .win-message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255,255,255,0.9);
+      padding: 20px 30px;
+      border-radius: 10px;
+      font-size: 20px;
+      font-weight: bold;
+      display: none;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎂❤️ Happy Birthday, my Love ❤️🎂</h1>
+  <div class="game-container" id="game"></div>
+  <div class="win-message" id="winMessage">🎉 You did it! 🎉<br>You matched all the photos 💕<br>Happy Birthday, beautiful ❤️</div>
+
+  <script>
+    const photos = [
+      'Photos/Photo_1.jpg',
+      'Photos/Photo_2.jpg',
+      'Photos/Photo_3.jpg',
+      'Photos/Photo_4.jpg',
+      'Photos/Photo_5.jpg',
+      'Photos/Photo_6.jpg',
+      'Photos/Photo_7.jpg'
+    ];
+
+    let cards = [...photos, ...photos]; // duplicate photos for pairs
+    cards = cards.sort(() => 0.5 - Math.random()); // shuffle
+
+    const game = document.getElementById('game');
+
+    let flippedCards = [];
+    let matchedCount = 0;
+
+    cards.forEach((src, index) => {
+      const card = document.createElement('div');
+      card.classList.add('card');
+
+      const inner = document.createElement('div');
+      inner.classList.add('card-inner');
+
+      const front = document.createElement('div');
+      front.classList.add('card-front');
+      front.textContent = "?";
+
+      const back = document.createElement('div');
+      back.classList.add('card-back');
+      back.style.backgroundImage = `url(${src})`;
+
+      inner.appendChild(front);
+      inner.appendChild(back);
+      card.appendChild(inner);
+      game.appendChild(card);
+
+      card.addEventListener('click', () => {
+        if (flippedCards.length < 2 && !card.classList.contains('flipped')) {
+          card.classList.add('flipped');
+          flippedCards.push({card, src});
+
+          if (flippedCards.length === 2) {
+            if (flippedCards[0].src === flippedCards[1].src) {
+              matchedCount++;
+              flippedCards = [];
+
+              if (matchedCount === photos.length) {
+                document.getElementById('winMessage').style.display = 'block';
+              }
+            } else {
+              setTimeout(() => {
+                flippedCards[0].card.classList.remove('flipped');
+                flippedCards[1].card.classList.remove('flipped');
+                flippedCards = [];
+              }, 1000);
+            }
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
